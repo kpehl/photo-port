@@ -1,15 +1,33 @@
 // Contact Form Component
 import React, {useState} from 'react';
+import {validateEmail} from '../../utils/helpers';
 
 function ContactForm() {
     const [formState, setFormState] = useState({ name: '', email: '', message: ''});
     const { name, email, message } = formState;
+    const [errorMessage, setErrorMessage] = useState('');
     function handleChange(event) {
-        setFormState({...formState, [event.target.name]: event.target.value })
+        if (event.target.name === 'email') {
+            const isValid = validateEmail(event.target.value);
+            if(!isValid) {
+                setErrorMessage('Your email is invalid.');
+            } else {
+                setErrorMessage('');
+            }
+        } else {
+            if (!event.target.value.length) {
+                setErrorMessage(`${event.target.name} is required.`);
+            } else {
+                setErrorMessage('');
+            }
+        }
+        if(!errorMessage) {
+            setFormState({...formState, [event.target.name]: event.target.value });
+        }
     }
     function handleSubmit(event) {
         event.preventDefault();
-        console.log(formState)
+        console.log(formState);
     }
     return (
         <section>
@@ -27,6 +45,11 @@ function ContactForm() {
                     <label htmlFor="message">Message:</label>
                     <textarea name="message" rows="5" defaultValue={message} onChange={handleChange} />
                 </div>
+                {errorMessage && (
+                    <div>
+                        <p className="error-text">{errorMessage}</p>
+                    </div>
+                )}
                 <button type="submit">Submit</button>
             </form>
         </section>
